@@ -9,13 +9,55 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VisitesRouteImport } from './routes/visites'
+import { Route as ProduitsRouteImport } from './routes/produits'
+import { Route as PanierRouteImport } from './routes/panier'
+import { Route as NotreHistoireRouteImport } from './routes/notre-histoire'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProduitsSlugRouteImport } from './routes/produits.$slug'
+import { Route as CommandeConfirmeeRouteImport } from './routes/commande.confirmee'
 import { Route as ApiPublicSuggestionsRouteImport } from './routes/api/public/suggestions'
 import { Route as ApiPublicOrdersRouteImport } from './routes/api/public/orders'
 
+const VisitesRoute = VisitesRouteImport.update({
+  id: '/visites',
+  path: '/visites',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProduitsRoute = ProduitsRouteImport.update({
+  id: '/produits',
+  path: '/produits',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PanierRoute = PanierRouteImport.update({
+  id: '/panier',
+  path: '/panier',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotreHistoireRoute = NotreHistoireRouteImport.update({
+  id: '/notre-histoire',
+  path: '/notre-histoire',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProduitsSlugRoute = ProduitsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => ProduitsRoute,
+} as any)
+const CommandeConfirmeeRoute = CommandeConfirmeeRouteImport.update({
+  id: '/commande/confirmee',
+  path: '/commande/confirmee',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicSuggestionsRoute = ApiPublicSuggestionsRouteImport.update({
@@ -31,41 +73,148 @@ const ApiPublicOrdersRoute = ApiPublicOrdersRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/contact': typeof ContactRoute
+  '/notre-histoire': typeof NotreHistoireRoute
+  '/panier': typeof PanierRoute
+  '/produits': typeof ProduitsRouteWithChildren
+  '/visites': typeof VisitesRoute
+  '/commande/confirmee': typeof CommandeConfirmeeRoute
+  '/produits/$slug': typeof ProduitsSlugRoute
   '/api/public/orders': typeof ApiPublicOrdersRoute
   '/api/public/suggestions': typeof ApiPublicSuggestionsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/contact': typeof ContactRoute
+  '/notre-histoire': typeof NotreHistoireRoute
+  '/panier': typeof PanierRoute
+  '/produits': typeof ProduitsRouteWithChildren
+  '/visites': typeof VisitesRoute
+  '/commande/confirmee': typeof CommandeConfirmeeRoute
+  '/produits/$slug': typeof ProduitsSlugRoute
   '/api/public/orders': typeof ApiPublicOrdersRoute
   '/api/public/suggestions': typeof ApiPublicSuggestionsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/contact': typeof ContactRoute
+  '/notre-histoire': typeof NotreHistoireRoute
+  '/panier': typeof PanierRoute
+  '/produits': typeof ProduitsRouteWithChildren
+  '/visites': typeof VisitesRoute
+  '/commande/confirmee': typeof CommandeConfirmeeRoute
+  '/produits/$slug': typeof ProduitsSlugRoute
   '/api/public/orders': typeof ApiPublicOrdersRoute
   '/api/public/suggestions': typeof ApiPublicSuggestionsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/public/orders' | '/api/public/suggestions'
+  fullPaths:
+    | '/'
+    | '/contact'
+    | '/notre-histoire'
+    | '/panier'
+    | '/produits'
+    | '/visites'
+    | '/commande/confirmee'
+    | '/produits/$slug'
+    | '/api/public/orders'
+    | '/api/public/suggestions'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/public/orders' | '/api/public/suggestions'
-  id: '__root__' | '/' | '/api/public/orders' | '/api/public/suggestions'
+  to:
+    | '/'
+    | '/contact'
+    | '/notre-histoire'
+    | '/panier'
+    | '/produits'
+    | '/visites'
+    | '/commande/confirmee'
+    | '/produits/$slug'
+    | '/api/public/orders'
+    | '/api/public/suggestions'
+  id:
+    | '__root__'
+    | '/'
+    | '/contact'
+    | '/notre-histoire'
+    | '/panier'
+    | '/produits'
+    | '/visites'
+    | '/commande/confirmee'
+    | '/produits/$slug'
+    | '/api/public/orders'
+    | '/api/public/suggestions'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ContactRoute: typeof ContactRoute
+  NotreHistoireRoute: typeof NotreHistoireRoute
+  PanierRoute: typeof PanierRoute
+  ProduitsRoute: typeof ProduitsRouteWithChildren
+  VisitesRoute: typeof VisitesRoute
+  CommandeConfirmeeRoute: typeof CommandeConfirmeeRoute
   ApiPublicOrdersRoute: typeof ApiPublicOrdersRoute
   ApiPublicSuggestionsRoute: typeof ApiPublicSuggestionsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/visites': {
+      id: '/visites'
+      path: '/visites'
+      fullPath: '/visites'
+      preLoaderRoute: typeof VisitesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/produits': {
+      id: '/produits'
+      path: '/produits'
+      fullPath: '/produits'
+      preLoaderRoute: typeof ProduitsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/panier': {
+      id: '/panier'
+      path: '/panier'
+      fullPath: '/panier'
+      preLoaderRoute: typeof PanierRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notre-histoire': {
+      id: '/notre-histoire'
+      path: '/notre-histoire'
+      fullPath: '/notre-histoire'
+      preLoaderRoute: typeof NotreHistoireRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/produits/$slug': {
+      id: '/produits/$slug'
+      path: '/$slug'
+      fullPath: '/produits/$slug'
+      preLoaderRoute: typeof ProduitsSlugRouteImport
+      parentRoute: typeof ProduitsRoute
+    }
+    '/commande/confirmee': {
+      id: '/commande/confirmee'
+      path: '/commande/confirmee'
+      fullPath: '/commande/confirmee'
+      preLoaderRoute: typeof CommandeConfirmeeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/suggestions': {
@@ -85,8 +234,26 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface ProduitsRouteChildren {
+  ProduitsSlugRoute: typeof ProduitsSlugRoute
+}
+
+const ProduitsRouteChildren: ProduitsRouteChildren = {
+  ProduitsSlugRoute: ProduitsSlugRoute,
+}
+
+const ProduitsRouteWithChildren = ProduitsRoute._addFileChildren(
+  ProduitsRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ContactRoute: ContactRoute,
+  NotreHistoireRoute: NotreHistoireRoute,
+  PanierRoute: PanierRoute,
+  ProduitsRoute: ProduitsRouteWithChildren,
+  VisitesRoute: VisitesRoute,
+  CommandeConfirmeeRoute: CommandeConfirmeeRoute,
   ApiPublicOrdersRoute: ApiPublicOrdersRoute,
   ApiPublicSuggestionsRoute: ApiPublicSuggestionsRoute,
 }
