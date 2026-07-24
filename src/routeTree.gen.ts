@@ -10,33 +10,53 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiPublicSuggestionsRouteImport } from './routes/api/public/suggestions'
+import { Route as ApiPublicOrdersRouteImport } from './routes/api/public/orders'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicSuggestionsRoute = ApiPublicSuggestionsRouteImport.update({
+  id: '/api/public/suggestions',
+  path: '/api/public/suggestions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicOrdersRoute = ApiPublicOrdersRouteImport.update({
+  id: '/api/public/orders',
+  path: '/api/public/orders',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/public/orders': typeof ApiPublicOrdersRoute
+  '/api/public/suggestions': typeof ApiPublicSuggestionsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/public/orders': typeof ApiPublicOrdersRoute
+  '/api/public/suggestions': typeof ApiPublicSuggestionsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api/public/orders': typeof ApiPublicOrdersRoute
+  '/api/public/suggestions': typeof ApiPublicSuggestionsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/api/public/orders' | '/api/public/suggestions'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/api/public/orders' | '/api/public/suggestions'
+  id: '__root__' | '/' | '/api/public/orders' | '/api/public/suggestions'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiPublicOrdersRoute: typeof ApiPublicOrdersRoute
+  ApiPublicSuggestionsRoute: typeof ApiPublicSuggestionsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +68,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/suggestions': {
+      id: '/api/public/suggestions'
+      path: '/api/public/suggestions'
+      fullPath: '/api/public/suggestions'
+      preLoaderRoute: typeof ApiPublicSuggestionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/orders': {
+      id: '/api/public/orders'
+      path: '/api/public/orders'
+      fullPath: '/api/public/orders'
+      preLoaderRoute: typeof ApiPublicOrdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiPublicOrdersRoute: ApiPublicOrdersRoute,
+  ApiPublicSuggestionsRoute: ApiPublicSuggestionsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
