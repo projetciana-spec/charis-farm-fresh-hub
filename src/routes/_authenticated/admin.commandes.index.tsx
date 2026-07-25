@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Trash2, MessageCircle } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/admin/commandes")({
+export const Route = createFileRoute("/_authenticated/admin/commandes/")({
   component: AdminCommandes,
 });
 
