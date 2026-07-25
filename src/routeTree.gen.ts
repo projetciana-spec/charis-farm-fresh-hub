@@ -25,6 +25,7 @@ import { Route as ApiPublicSuggestionsRouteImport } from './routes/api/public/su
 import { Route as ApiPublicOrdersRouteImport } from './routes/api/public/orders'
 import { Route as AuthenticatedAdminProduitsRouteImport } from './routes/_authenticated/admin.produits'
 import { Route as AuthenticatedAdminCategoriesRouteImport } from './routes/_authenticated/admin.categories'
+import { Route as AuthenticatedAdminBannieresRouteImport } from './routes/_authenticated/admin.bannieres'
 
 const VisitesRoute = VisitesRouteImport.update({
   id: '/visites',
@@ -107,6 +108,12 @@ const AuthenticatedAdminCategoriesRoute =
     path: '/categories',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminBannieresRoute =
+  AuthenticatedAdminBannieresRouteImport.update({
+    id: '/bannieres',
+    path: '/bannieres',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -119,6 +126,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/commande/confirmee': typeof CommandeConfirmeeRoute
   '/produits/$slug': typeof ProduitsSlugRoute
+  '/admin/bannieres': typeof AuthenticatedAdminBannieresRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/admin/produits': typeof AuthenticatedAdminProduitsRoute
   '/api/public/orders': typeof ApiPublicOrdersRoute
@@ -135,6 +143,7 @@ export interface FileRoutesByTo {
   '/visites': typeof VisitesRoute
   '/commande/confirmee': typeof CommandeConfirmeeRoute
   '/produits/$slug': typeof ProduitsSlugRoute
+  '/admin/bannieres': typeof AuthenticatedAdminBannieresRoute
   '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/admin/produits': typeof AuthenticatedAdminProduitsRoute
   '/api/public/orders': typeof ApiPublicOrdersRoute
@@ -154,6 +163,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/commande/confirmee': typeof CommandeConfirmeeRoute
   '/produits/$slug': typeof ProduitsSlugRoute
+  '/_authenticated/admin/bannieres': typeof AuthenticatedAdminBannieresRoute
   '/_authenticated/admin/categories': typeof AuthenticatedAdminCategoriesRoute
   '/_authenticated/admin/produits': typeof AuthenticatedAdminProduitsRoute
   '/api/public/orders': typeof ApiPublicOrdersRoute
@@ -173,6 +183,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/commande/confirmee'
     | '/produits/$slug'
+    | '/admin/bannieres'
     | '/admin/categories'
     | '/admin/produits'
     | '/api/public/orders'
@@ -189,6 +200,7 @@ export interface FileRouteTypes {
     | '/visites'
     | '/commande/confirmee'
     | '/produits/$slug'
+    | '/admin/bannieres'
     | '/admin/categories'
     | '/admin/produits'
     | '/api/public/orders'
@@ -207,6 +219,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/commande/confirmee'
     | '/produits/$slug'
+    | '/_authenticated/admin/bannieres'
     | '/_authenticated/admin/categories'
     | '/_authenticated/admin/produits'
     | '/api/public/orders'
@@ -342,16 +355,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCategoriesRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/bannieres': {
+      id: '/_authenticated/admin/bannieres'
+      path: '/bannieres'
+      fullPath: '/admin/bannieres'
+      preLoaderRoute: typeof AuthenticatedAdminBannieresRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminBannieresRoute: typeof AuthenticatedAdminBannieresRoute
   AuthenticatedAdminCategoriesRoute: typeof AuthenticatedAdminCategoriesRoute
   AuthenticatedAdminProduitsRoute: typeof AuthenticatedAdminProduitsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminBannieresRoute: AuthenticatedAdminBannieresRoute,
   AuthenticatedAdminCategoriesRoute: AuthenticatedAdminCategoriesRoute,
   AuthenticatedAdminProduitsRoute: AuthenticatedAdminProduitsRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
