@@ -15,9 +15,11 @@ import { Route as PanierRouteImport } from './routes/panier'
 import { Route as NotreHistoireRouteImport } from './routes/notre-histoire'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProduitsSlugRouteImport } from './routes/produits.$slug'
 import { Route as CommandeConfirmeeRouteImport } from './routes/commande.confirmee'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as ApiPublicSuggestionsRouteImport } from './routes/api/public/suggestions'
 import { Route as ApiPublicOrdersRouteImport } from './routes/api/public/orders'
 
@@ -51,6 +53,10 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -65,6 +71,11 @@ const CommandeConfirmeeRoute = CommandeConfirmeeRouteImport.update({
   id: '/commande/confirmee',
   path: '/commande/confirmee',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const ApiPublicSuggestionsRoute = ApiPublicSuggestionsRouteImport.update({
   id: '/api/public/suggestions',
@@ -85,6 +96,7 @@ export interface FileRoutesByFullPath {
   '/panier': typeof PanierRoute
   '/produits': typeof ProduitsRouteWithChildren
   '/visites': typeof VisitesRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/commande/confirmee': typeof CommandeConfirmeeRoute
   '/produits/$slug': typeof ProduitsSlugRoute
   '/api/public/orders': typeof ApiPublicOrdersRoute
@@ -98,6 +110,7 @@ export interface FileRoutesByTo {
   '/panier': typeof PanierRoute
   '/produits': typeof ProduitsRouteWithChildren
   '/visites': typeof VisitesRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/commande/confirmee': typeof CommandeConfirmeeRoute
   '/produits/$slug': typeof ProduitsSlugRoute
   '/api/public/orders': typeof ApiPublicOrdersRoute
@@ -106,12 +119,14 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/notre-histoire': typeof NotreHistoireRoute
   '/panier': typeof PanierRoute
   '/produits': typeof ProduitsRouteWithChildren
   '/visites': typeof VisitesRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/commande/confirmee': typeof CommandeConfirmeeRoute
   '/produits/$slug': typeof ProduitsSlugRoute
   '/api/public/orders': typeof ApiPublicOrdersRoute
@@ -127,6 +142,7 @@ export interface FileRouteTypes {
     | '/panier'
     | '/produits'
     | '/visites'
+    | '/admin'
     | '/commande/confirmee'
     | '/produits/$slug'
     | '/api/public/orders'
@@ -140,6 +156,7 @@ export interface FileRouteTypes {
     | '/panier'
     | '/produits'
     | '/visites'
+    | '/admin'
     | '/commande/confirmee'
     | '/produits/$slug'
     | '/api/public/orders'
@@ -147,12 +164,14 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/auth'
     | '/contact'
     | '/notre-histoire'
     | '/panier'
     | '/produits'
     | '/visites'
+    | '/_authenticated/admin'
     | '/commande/confirmee'
     | '/produits/$slug'
     | '/api/public/orders'
@@ -161,6 +180,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
   NotreHistoireRoute: typeof NotreHistoireRoute
@@ -216,6 +236,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -237,6 +264,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CommandeConfirmeeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/public/suggestions': {
       id: '/api/public/suggestions'
       path: '/api/public/suggestions'
@@ -254,6 +288,17 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 interface ProduitsRouteChildren {
   ProduitsSlugRoute: typeof ProduitsSlugRoute
 }
@@ -268,6 +313,7 @@ const ProduitsRouteWithChildren = ProduitsRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
   NotreHistoireRoute: NotreHistoireRoute,

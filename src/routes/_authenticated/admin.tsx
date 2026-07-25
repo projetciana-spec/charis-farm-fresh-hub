@@ -24,7 +24,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminLayout,
 });
 
-const nav = [
+const nav: { to: string; label: string; icon: any; exact?: boolean }[] = [
   { to: "/admin", label: "Tableau de bord", icon: LayoutDashboard, exact: true },
   { to: "/admin/produits", label: "Produits", icon: Package },
   { to: "/admin/categories", label: "Catégories", icon: Tags },
@@ -32,7 +32,7 @@ const nav = [
   { to: "/admin/commandes", label: "Commandes", icon: ShoppingBag },
   { to: "/admin/suggestions", label: "Suggestions", icon: MessageSquare },
   { to: "/admin/parametres", label: "Paramètres", icon: Settings },
-] as const;
+];
 
 function AdminLayout() {
   const navigate = useNavigate();
@@ -86,7 +86,7 @@ function AdminLayout() {
             return (
               <Link
                 key={item.to}
-                to={item.to}
+                to={item.to as any}
                 className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm ${
                   active
                     ? "bg-primary text-primary-foreground"
@@ -115,7 +115,7 @@ function AdminLayout() {
           {nav.map((item) => (
             <Link
               key={item.to}
-              to={item.to}
+              to={item.to as any}
               className="whitespace-nowrap rounded-md px-3 py-1.5 text-xs text-muted-foreground"
             >
               {item.label}
