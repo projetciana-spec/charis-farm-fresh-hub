@@ -23,6 +23,7 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as ApiPublicSuggestionsRouteImport } from './routes/api/public/suggestions'
 import { Route as ApiPublicOrdersRouteImport } from './routes/api/public/orders'
+import { Route as AuthenticatedAdminProduitsRouteImport } from './routes/_authenticated/admin.produits'
 
 const VisitesRoute = VisitesRouteImport.update({
   id: '/visites',
@@ -93,6 +94,12 @@ const ApiPublicOrdersRoute = ApiPublicOrdersRouteImport.update({
   path: '/api/public/orders',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminProduitsRoute =
+  AuthenticatedAdminProduitsRouteImport.update({
+    id: '/produits',
+    path: '/produits',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -105,6 +112,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/commande/confirmee': typeof CommandeConfirmeeRoute
   '/produits/$slug': typeof ProduitsSlugRoute
+  '/admin/produits': typeof AuthenticatedAdminProduitsRoute
   '/api/public/orders': typeof ApiPublicOrdersRoute
   '/api/public/suggestions': typeof ApiPublicSuggestionsRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -119,6 +127,7 @@ export interface FileRoutesByTo {
   '/visites': typeof VisitesRoute
   '/commande/confirmee': typeof CommandeConfirmeeRoute
   '/produits/$slug': typeof ProduitsSlugRoute
+  '/admin/produits': typeof AuthenticatedAdminProduitsRoute
   '/api/public/orders': typeof ApiPublicOrdersRoute
   '/api/public/suggestions': typeof ApiPublicSuggestionsRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -136,6 +145,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/commande/confirmee': typeof CommandeConfirmeeRoute
   '/produits/$slug': typeof ProduitsSlugRoute
+  '/_authenticated/admin/produits': typeof AuthenticatedAdminProduitsRoute
   '/api/public/orders': typeof ApiPublicOrdersRoute
   '/api/public/suggestions': typeof ApiPublicSuggestionsRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -153,6 +163,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/commande/confirmee'
     | '/produits/$slug'
+    | '/admin/produits'
     | '/api/public/orders'
     | '/api/public/suggestions'
     | '/admin/'
@@ -167,6 +178,7 @@ export interface FileRouteTypes {
     | '/visites'
     | '/commande/confirmee'
     | '/produits/$slug'
+    | '/admin/produits'
     | '/api/public/orders'
     | '/api/public/suggestions'
     | '/admin'
@@ -183,6 +195,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/commande/confirmee'
     | '/produits/$slug'
+    | '/_authenticated/admin/produits'
     | '/api/public/orders'
     | '/api/public/suggestions'
     | '/_authenticated/admin/'
@@ -302,14 +315,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicOrdersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin/produits': {
+      id: '/_authenticated/admin/produits'
+      path: '/produits'
+      fullPath: '/admin/produits'
+      preLoaderRoute: typeof AuthenticatedAdminProduitsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminProduitsRoute: typeof AuthenticatedAdminProduitsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminProduitsRoute: AuthenticatedAdminProduitsRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 
