@@ -1,0 +1,3 @@
+CREATE POLICY "admin delete commandes" ON public.commandes FOR DELETE TO authenticated USING (public.has_role(auth.uid(), 'admin'));
+CREATE POLICY "admin delete commande_items" ON public.commande_items FOR DELETE TO authenticated USING (public.has_role(auth.uid(), 'admin'));
+CREATE POLICY "admin delete suggestions" ON public.suggestions FOR DELETE TO authenticated USING (public.has_role(auth.uid(), 'admin'));
