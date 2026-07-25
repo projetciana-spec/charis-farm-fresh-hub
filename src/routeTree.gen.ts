@@ -14,11 +14,22 @@ import { Route as ProduitsRouteImport } from './routes/produits'
 import { Route as PanierRouteImport } from './routes/panier'
 import { Route as NotreHistoireRouteImport } from './routes/notre-histoire'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProduitsSlugRouteImport } from './routes/produits.$slug'
 import { Route as CommandeConfirmeeRouteImport } from './routes/commande.confirmee'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as ApiPublicSuggestionsRouteImport } from './routes/api/public/suggestions'
 import { Route as ApiPublicOrdersRouteImport } from './routes/api/public/orders'
+import { Route as AuthenticatedAdminSuggestionsRouteImport } from './routes/_authenticated/admin.suggestions'
+import { Route as AuthenticatedAdminProduitsRouteImport } from './routes/_authenticated/admin.produits'
+import { Route as AuthenticatedAdminParametresRouteImport } from './routes/_authenticated/admin.parametres'
+import { Route as AuthenticatedAdminCategoriesRouteImport } from './routes/_authenticated/admin.categories'
+import { Route as AuthenticatedAdminBannieresRouteImport } from './routes/_authenticated/admin.bannieres'
+import { Route as AuthenticatedAdminCommandesIndexRouteImport } from './routes/_authenticated/admin.commandes.index'
+import { Route as AuthenticatedAdminCommandesIdRouteImport } from './routes/_authenticated/admin.commandes.$id'
 
 const VisitesRoute = VisitesRouteImport.update({
   id: '/visites',
@@ -45,6 +56,15 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -60,6 +80,16 @@ const CommandeConfirmeeRoute = CommandeConfirmeeRouteImport.update({
   path: '/commande/confirmee',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 const ApiPublicSuggestionsRoute = ApiPublicSuggestionsRouteImport.update({
   id: '/api/public/suggestions',
   path: '/api/public/suggestions',
@@ -70,21 +100,74 @@ const ApiPublicOrdersRoute = ApiPublicOrdersRouteImport.update({
   path: '/api/public/orders',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminSuggestionsRoute =
+  AuthenticatedAdminSuggestionsRouteImport.update({
+    id: '/suggestions',
+    path: '/suggestions',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminProduitsRoute =
+  AuthenticatedAdminProduitsRouteImport.update({
+    id: '/produits',
+    path: '/produits',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminParametresRoute =
+  AuthenticatedAdminParametresRouteImport.update({
+    id: '/parametres',
+    path: '/parametres',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminCategoriesRoute =
+  AuthenticatedAdminCategoriesRouteImport.update({
+    id: '/categories',
+    path: '/categories',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminBannieresRoute =
+  AuthenticatedAdminBannieresRouteImport.update({
+    id: '/bannieres',
+    path: '/bannieres',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminCommandesIndexRoute =
+  AuthenticatedAdminCommandesIndexRouteImport.update({
+    id: '/commandes/',
+    path: '/commandes/',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminCommandesIdRoute =
+  AuthenticatedAdminCommandesIdRouteImport.update({
+    id: '/commandes/$id',
+    path: '/commandes/$id',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/notre-histoire': typeof NotreHistoireRoute
   '/panier': typeof PanierRoute
   '/produits': typeof ProduitsRouteWithChildren
   '/visites': typeof VisitesRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/commande/confirmee': typeof CommandeConfirmeeRoute
   '/produits/$slug': typeof ProduitsSlugRoute
+  '/admin/bannieres': typeof AuthenticatedAdminBannieresRoute
+  '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
+  '/admin/parametres': typeof AuthenticatedAdminParametresRoute
+  '/admin/produits': typeof AuthenticatedAdminProduitsRoute
+  '/admin/suggestions': typeof AuthenticatedAdminSuggestionsRoute
   '/api/public/orders': typeof ApiPublicOrdersRoute
   '/api/public/suggestions': typeof ApiPublicSuggestionsRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/admin/commandes/$id': typeof AuthenticatedAdminCommandesIdRoute
+  '/admin/commandes/': typeof AuthenticatedAdminCommandesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/notre-histoire': typeof NotreHistoireRoute
   '/panier': typeof PanierRoute
@@ -92,38 +175,68 @@ export interface FileRoutesByTo {
   '/visites': typeof VisitesRoute
   '/commande/confirmee': typeof CommandeConfirmeeRoute
   '/produits/$slug': typeof ProduitsSlugRoute
+  '/admin/bannieres': typeof AuthenticatedAdminBannieresRoute
+  '/admin/categories': typeof AuthenticatedAdminCategoriesRoute
+  '/admin/parametres': typeof AuthenticatedAdminParametresRoute
+  '/admin/produits': typeof AuthenticatedAdminProduitsRoute
+  '/admin/suggestions': typeof AuthenticatedAdminSuggestionsRoute
   '/api/public/orders': typeof ApiPublicOrdersRoute
   '/api/public/suggestions': typeof ApiPublicSuggestionsRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
+  '/admin/commandes/$id': typeof AuthenticatedAdminCommandesIdRoute
+  '/admin/commandes': typeof AuthenticatedAdminCommandesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/notre-histoire': typeof NotreHistoireRoute
   '/panier': typeof PanierRoute
   '/produits': typeof ProduitsRouteWithChildren
   '/visites': typeof VisitesRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/commande/confirmee': typeof CommandeConfirmeeRoute
   '/produits/$slug': typeof ProduitsSlugRoute
+  '/_authenticated/admin/bannieres': typeof AuthenticatedAdminBannieresRoute
+  '/_authenticated/admin/categories': typeof AuthenticatedAdminCategoriesRoute
+  '/_authenticated/admin/parametres': typeof AuthenticatedAdminParametresRoute
+  '/_authenticated/admin/produits': typeof AuthenticatedAdminProduitsRoute
+  '/_authenticated/admin/suggestions': typeof AuthenticatedAdminSuggestionsRoute
   '/api/public/orders': typeof ApiPublicOrdersRoute
   '/api/public/suggestions': typeof ApiPublicSuggestionsRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/admin/commandes/$id': typeof AuthenticatedAdminCommandesIdRoute
+  '/_authenticated/admin/commandes/': typeof AuthenticatedAdminCommandesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/auth'
     | '/contact'
     | '/notre-histoire'
     | '/panier'
     | '/produits'
     | '/visites'
+    | '/admin'
     | '/commande/confirmee'
     | '/produits/$slug'
+    | '/admin/bannieres'
+    | '/admin/categories'
+    | '/admin/parametres'
+    | '/admin/produits'
+    | '/admin/suggestions'
     | '/api/public/orders'
     | '/api/public/suggestions'
+    | '/admin/'
+    | '/admin/commandes/$id'
+    | '/admin/commandes/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/auth'
     | '/contact'
     | '/notre-histoire'
     | '/panier'
@@ -131,24 +244,45 @@ export interface FileRouteTypes {
     | '/visites'
     | '/commande/confirmee'
     | '/produits/$slug'
+    | '/admin/bannieres'
+    | '/admin/categories'
+    | '/admin/parametres'
+    | '/admin/produits'
+    | '/admin/suggestions'
     | '/api/public/orders'
     | '/api/public/suggestions'
+    | '/admin'
+    | '/admin/commandes/$id'
+    | '/admin/commandes'
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
+    | '/auth'
     | '/contact'
     | '/notre-histoire'
     | '/panier'
     | '/produits'
     | '/visites'
+    | '/_authenticated/admin'
     | '/commande/confirmee'
     | '/produits/$slug'
+    | '/_authenticated/admin/bannieres'
+    | '/_authenticated/admin/categories'
+    | '/_authenticated/admin/parametres'
+    | '/_authenticated/admin/produits'
+    | '/_authenticated/admin/suggestions'
     | '/api/public/orders'
     | '/api/public/suggestions'
+    | '/_authenticated/admin/'
+    | '/_authenticated/admin/commandes/$id'
+    | '/_authenticated/admin/commandes/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
   NotreHistoireRoute: typeof NotreHistoireRoute
   PanierRoute: typeof PanierRoute
@@ -196,6 +330,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -217,6 +365,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CommandeConfirmeeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/api/public/suggestions': {
       id: '/api/public/suggestions'
       path: '/api/public/suggestions'
@@ -231,8 +393,93 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicOrdersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin/suggestions': {
+      id: '/_authenticated/admin/suggestions'
+      path: '/suggestions'
+      fullPath: '/admin/suggestions'
+      preLoaderRoute: typeof AuthenticatedAdminSuggestionsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/produits': {
+      id: '/_authenticated/admin/produits'
+      path: '/produits'
+      fullPath: '/admin/produits'
+      preLoaderRoute: typeof AuthenticatedAdminProduitsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/parametres': {
+      id: '/_authenticated/admin/parametres'
+      path: '/parametres'
+      fullPath: '/admin/parametres'
+      preLoaderRoute: typeof AuthenticatedAdminParametresRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/categories': {
+      id: '/_authenticated/admin/categories'
+      path: '/categories'
+      fullPath: '/admin/categories'
+      preLoaderRoute: typeof AuthenticatedAdminCategoriesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/bannieres': {
+      id: '/_authenticated/admin/bannieres'
+      path: '/bannieres'
+      fullPath: '/admin/bannieres'
+      preLoaderRoute: typeof AuthenticatedAdminBannieresRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/commandes/': {
+      id: '/_authenticated/admin/commandes/'
+      path: '/commandes'
+      fullPath: '/admin/commandes/'
+      preLoaderRoute: typeof AuthenticatedAdminCommandesIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/commandes/$id': {
+      id: '/_authenticated/admin/commandes/$id'
+      path: '/commandes/$id'
+      fullPath: '/admin/commandes/$id'
+      preLoaderRoute: typeof AuthenticatedAdminCommandesIdRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
+
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminBannieresRoute: typeof AuthenticatedAdminBannieresRoute
+  AuthenticatedAdminCategoriesRoute: typeof AuthenticatedAdminCategoriesRoute
+  AuthenticatedAdminParametresRoute: typeof AuthenticatedAdminParametresRoute
+  AuthenticatedAdminProduitsRoute: typeof AuthenticatedAdminProduitsRoute
+  AuthenticatedAdminSuggestionsRoute: typeof AuthenticatedAdminSuggestionsRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedAdminCommandesIdRoute: typeof AuthenticatedAdminCommandesIdRoute
+  AuthenticatedAdminCommandesIndexRoute: typeof AuthenticatedAdminCommandesIndexRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminBannieresRoute: AuthenticatedAdminBannieresRoute,
+  AuthenticatedAdminCategoriesRoute: AuthenticatedAdminCategoriesRoute,
+  AuthenticatedAdminParametresRoute: AuthenticatedAdminParametresRoute,
+  AuthenticatedAdminProduitsRoute: AuthenticatedAdminProduitsRoute,
+  AuthenticatedAdminSuggestionsRoute: AuthenticatedAdminSuggestionsRoute,
+  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  AuthenticatedAdminCommandesIdRoute: AuthenticatedAdminCommandesIdRoute,
+  AuthenticatedAdminCommandesIndexRoute: AuthenticatedAdminCommandesIndexRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface ProduitsRouteChildren {
   ProduitsSlugRoute: typeof ProduitsSlugRoute
@@ -248,6 +495,8 @@ const ProduitsRouteWithChildren = ProduitsRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
   NotreHistoireRoute: NotreHistoireRoute,
   PanierRoute: PanierRoute,
