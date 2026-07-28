@@ -14,16 +14,296 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      bannieres: {
+        Row: {
+          actif: boolean
+          created_at: string
+          cta_lien: string | null
+          cta_texte: string | null
+          id: string
+          image_url: string | null
+          ordre: number
+          sous_titre: string | null
+          titre: string
+        }
+        Insert: {
+          actif?: boolean
+          created_at?: string
+          cta_lien?: string | null
+          cta_texte?: string | null
+          id?: string
+          image_url?: string | null
+          ordre?: number
+          sous_titre?: string | null
+          titre: string
+        }
+        Update: {
+          actif?: boolean
+          created_at?: string
+          cta_lien?: string | null
+          cta_texte?: string | null
+          id?: string
+          image_url?: string | null
+          ordre?: number
+          sous_titre?: string | null
+          titre?: string
+        }
+        Relationships: []
+      }
+      categories: {
+        Row: {
+          created_at: string
+          id: string
+          nom: string
+          ordre: number
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nom: string
+          ordre?: number
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nom?: string
+          ordre?: number
+          slug?: string
+        }
+        Relationships: []
+      }
+      commande_items: {
+        Row: {
+          commande_id: string
+          created_at: string
+          id: string
+          nom_snapshot: string
+          prix_snapshot: number | null
+          produit_id: string | null
+          quantite: number
+        }
+        Insert: {
+          commande_id: string
+          created_at?: string
+          id?: string
+          nom_snapshot: string
+          prix_snapshot?: number | null
+          produit_id?: string | null
+          quantite?: number
+        }
+        Update: {
+          commande_id?: string
+          created_at?: string
+          id?: string
+          nom_snapshot?: string
+          prix_snapshot?: number | null
+          produit_id?: string | null
+          quantite?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commande_items_commande_id_fkey"
+            columns: ["commande_id"]
+            isOneToOne: false
+            referencedRelation: "commandes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commande_items_produit_id_fkey"
+            columns: ["produit_id"]
+            isOneToOne: false
+            referencedRelation: "produits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      commandes: {
+        Row: {
+          adresse: string | null
+          created_at: string
+          email: string | null
+          id: string
+          nom: string
+          notes: string | null
+          numero: number
+          prenom: string
+          source: string
+          statut: string
+          total: number
+          whatsapp: string
+        }
+        Insert: {
+          adresse?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          nom: string
+          notes?: string | null
+          numero?: number
+          prenom: string
+          source?: string
+          statut?: string
+          total?: number
+          whatsapp: string
+        }
+        Update: {
+          adresse?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          nom?: string
+          notes?: string | null
+          numero?: number
+          prenom?: string
+          source?: string
+          statut?: string
+          total?: number
+          whatsapp?: string
+        }
+        Relationships: []
+      }
+      parametres: {
+        Row: {
+          cle: string
+          valeur: string | null
+        }
+        Insert: {
+          cle: string
+          valeur?: string | null
+        }
+        Update: {
+          cle?: string
+          valeur?: string | null
+        }
+        Relationships: []
+      }
+      produits: {
+        Row: {
+          categorie_id: string | null
+          created_at: string
+          description: string | null
+          en_stock: boolean
+          id: string
+          image_url: string | null
+          mis_en_avant: boolean
+          nom: string
+          ordre: number
+          prix: number | null
+          prix_sur_demande: boolean
+          slug: string
+          unite: string | null
+          updated_at: string
+        }
+        Insert: {
+          categorie_id?: string | null
+          created_at?: string
+          description?: string | null
+          en_stock?: boolean
+          id?: string
+          image_url?: string | null
+          mis_en_avant?: boolean
+          nom: string
+          ordre?: number
+          prix?: number | null
+          prix_sur_demande?: boolean
+          slug: string
+          unite?: string | null
+          updated_at?: string
+        }
+        Update: {
+          categorie_id?: string | null
+          created_at?: string
+          description?: string | null
+          en_stock?: boolean
+          id?: string
+          image_url?: string | null
+          mis_en_avant?: boolean
+          nom?: string
+          ordre?: number
+          prix?: number | null
+          prix_sur_demande?: boolean
+          slug?: string
+          unite?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "produits_categorie_id_fkey"
+            columns: ["categorie_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      suggestions: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          lu: boolean
+          message: string
+          nom: string
+          whatsapp: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          lu?: boolean
+          message: string
+          nom: string
+          whatsapp?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          lu?: boolean
+          message?: string
+          nom?: string
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +430,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const
