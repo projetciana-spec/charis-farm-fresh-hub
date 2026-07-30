@@ -44,8 +44,26 @@ function isH3SwallowedErrorBody(body: string): boolean {
   }
 }
 
+let bootstrapped = false;
+
+// Migration/seed automatique au premier appel de l'instance serveur (idempotent).
+async function ensureDatabase() {
+  if (bootstrapped) return;
+  bootstrapped = true;
+  try {
+    const { runMigrations } = await import("./lib/db-migrate.server");
+    const result = await runMigrations();
+    console.log(`[migrate] ${result.reason}`);
+  } catch (error) {
+    bootstrapped = false;
+    console.error("[migrate] non appliqué", error);
+  }
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    await ensureDatabase();
+
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
