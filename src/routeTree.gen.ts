@@ -23,6 +23,7 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as ApiPublicSuggestionsRouteImport } from './routes/api/public/suggestions'
 import { Route as ApiPublicOrdersRouteImport } from './routes/api/public/orders'
+import { Route as ApiPublicMigrateRouteImport } from './routes/api/public/migrate'
 import { Route as AuthenticatedAdminSuggestionsRouteImport } from './routes/_authenticated/admin.suggestions'
 import { Route as AuthenticatedAdminProduitsRouteImport } from './routes/_authenticated/admin.produits'
 import { Route as AuthenticatedAdminParametresRouteImport } from './routes/_authenticated/admin.parametres'
@@ -100,6 +101,11 @@ const ApiPublicOrdersRoute = ApiPublicOrdersRouteImport.update({
   path: '/api/public/orders',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicMigrateRoute = ApiPublicMigrateRouteImport.update({
+  id: '/api/public/migrate',
+  path: '/api/public/migrate',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminSuggestionsRoute =
   AuthenticatedAdminSuggestionsRouteImport.update({
     id: '/suggestions',
@@ -159,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/admin/parametres': typeof AuthenticatedAdminParametresRoute
   '/admin/produits': typeof AuthenticatedAdminProduitsRoute
   '/admin/suggestions': typeof AuthenticatedAdminSuggestionsRoute
+  '/api/public/migrate': typeof ApiPublicMigrateRoute
   '/api/public/orders': typeof ApiPublicOrdersRoute
   '/api/public/suggestions': typeof ApiPublicSuggestionsRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -180,6 +187,7 @@ export interface FileRoutesByTo {
   '/admin/parametres': typeof AuthenticatedAdminParametresRoute
   '/admin/produits': typeof AuthenticatedAdminProduitsRoute
   '/admin/suggestions': typeof AuthenticatedAdminSuggestionsRoute
+  '/api/public/migrate': typeof ApiPublicMigrateRoute
   '/api/public/orders': typeof ApiPublicOrdersRoute
   '/api/public/suggestions': typeof ApiPublicSuggestionsRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -204,6 +212,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/parametres': typeof AuthenticatedAdminParametresRoute
   '/_authenticated/admin/produits': typeof AuthenticatedAdminProduitsRoute
   '/_authenticated/admin/suggestions': typeof AuthenticatedAdminSuggestionsRoute
+  '/api/public/migrate': typeof ApiPublicMigrateRoute
   '/api/public/orders': typeof ApiPublicOrdersRoute
   '/api/public/suggestions': typeof ApiPublicSuggestionsRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -228,6 +237,7 @@ export interface FileRouteTypes {
     | '/admin/parametres'
     | '/admin/produits'
     | '/admin/suggestions'
+    | '/api/public/migrate'
     | '/api/public/orders'
     | '/api/public/suggestions'
     | '/admin/'
@@ -249,6 +259,7 @@ export interface FileRouteTypes {
     | '/admin/parametres'
     | '/admin/produits'
     | '/admin/suggestions'
+    | '/api/public/migrate'
     | '/api/public/orders'
     | '/api/public/suggestions'
     | '/admin'
@@ -272,6 +283,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/parametres'
     | '/_authenticated/admin/produits'
     | '/_authenticated/admin/suggestions'
+    | '/api/public/migrate'
     | '/api/public/orders'
     | '/api/public/suggestions'
     | '/_authenticated/admin/'
@@ -289,6 +301,7 @@ export interface RootRouteChildren {
   ProduitsRoute: typeof ProduitsRouteWithChildren
   VisitesRoute: typeof VisitesRoute
   CommandeConfirmeeRoute: typeof CommandeConfirmeeRoute
+  ApiPublicMigrateRoute: typeof ApiPublicMigrateRoute
   ApiPublicOrdersRoute: typeof ApiPublicOrdersRoute
   ApiPublicSuggestionsRoute: typeof ApiPublicSuggestionsRoute
 }
@@ -391,6 +404,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/orders'
       fullPath: '/api/public/orders'
       preLoaderRoute: typeof ApiPublicOrdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/migrate': {
+      id: '/api/public/migrate'
+      path: '/api/public/migrate'
+      fullPath: '/api/public/migrate'
+      preLoaderRoute: typeof ApiPublicMigrateRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/suggestions': {
@@ -503,19 +523,10 @@ const rootRouteChildren: RootRouteChildren = {
   ProduitsRoute: ProduitsRouteWithChildren,
   VisitesRoute: VisitesRoute,
   CommandeConfirmeeRoute: CommandeConfirmeeRoute,
+  ApiPublicMigrateRoute: ApiPublicMigrateRoute,
   ApiPublicOrdersRoute: ApiPublicOrdersRoute,
   ApiPublicSuggestionsRoute: ApiPublicSuggestionsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
