@@ -50,13 +50,12 @@ export const Route = createFileRoute("/api/public/kkiapay-webhook")({
           return new Response(JSON.stringify({ error: "transaction_id_manquant" }), { status: 400, headers: json });
         }
 
+        const body = parsed.success ? parsed.data : undefined;
+        const stateCommande = body?.stateData?.commandeId;
         const commandeId =
-          extractCommandeId(parsed.success ? parsed.data.data : undefined) ??
-          extractCommandeId(
-            typeof (parsed.success && parsed.data.stateData?.commandeId) === "string"
-              ? String(parsed.data.stateData!.commandeId)
-              : undefined,
-          );
+          extractCommandeId(body?.data) ??
+          extractCommandeId(typeof stateCommande === "string" ? stateCommande : undefined);
+
 
         try {
           const { applyPayment } = await import("@/lib/kkiapay.server");
