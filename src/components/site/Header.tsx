@@ -1,11 +1,15 @@
 import { Link } from "@tanstack/react-router";
 import { ShoppingCart, Menu, X, Leaf } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCart } from "@/lib/cart";
 
 export function Header() {
   const [open, setOpen] = useState(false);
-  const count = useCart((s) => s.count());
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []);
+  const cartCount = useCart((s) => s.count());
+  const count = hydrated ? cartCount : 0;
+
 
   const nav = [
     { to: "/produits", label: "Produits" },
