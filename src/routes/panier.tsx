@@ -211,12 +211,24 @@ function PanierPage() {
             </div>
 
             <button
+              onClick={payOnline}
+              disabled={loading || !payable}
+              className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90 disabled:opacity-60"
+            >
+              <CreditCard className="h-4 w-4" />
+              {loading ? "Traitement…" : `Payer maintenant ${formatXOF(total)}`}
+            </button>
+            <p className="text-center text-xs text-muted-foreground">
+              MTN / Moov Money, cartes bancaires — paiement sécurisé par KkiaPay
+            </p>
+            <button
               onClick={submitOnline}
               disabled={loading}
-              className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
+              className="flex w-full items-center justify-center gap-2 rounded-full border px-6 py-3 text-sm font-semibold hover:bg-secondary disabled:opacity-60"
             >
-              <ShoppingBag className="h-4 w-4" /> Valider la commande
+              <ShoppingBag className="h-4 w-4" /> Commander sans payer maintenant
             </button>
+
             <button
               onClick={submitWhatsapp}
               disabled={loading}
