@@ -205,3 +205,31 @@ CREATE POLICY "admin delete farm-images" ON storage.objects FOR DELETE TO authen
 CREATE POLICY "admin delete commandes" ON public.commandes FOR DELETE TO authenticated USING (public.has_role(auth.uid(), 'admin'));
 CREATE POLICY "admin delete commande_items" ON public.commande_items FOR DELETE TO authenticated USING (public.has_role(auth.uid(), 'admin'));
 CREATE POLICY "admin delete suggestions" ON public.suggestions FOR DELETE TO authenticated USING (public.has_role(auth.uid(), 'admin'));
+alter table public.commandes
+  add column if not exists paiement_statut text not null default 'non_paye',
+  add column if not exists paiement_montant numeric,
+  add column if not exists paiement_methode text,
+  add column if not exists paiement_transaction_id text,
+  add column if not exists paiement_verifie_at timestamptz;
+
+create unique index if not exists commandes_paiement_tx_uidx
+  on public.commandes (paiement_transaction_id)
+  where paiement_transaction_id is not null;
+
+create table if not exists public.paiement_events (
+  id uuid primary key default gen_random_uuid(),
+  transaction_id text not null unique,
+  commande_id uuid references public.commandes(id) on delete set null,
+  statut text not null,
+  montant numeric,
+  methode text,
+  payload jsonb,
+  created_at timestamptz not null default now()
+);
+
+grant select on public.paiement_events to authenticated;
+grant all on public.paiement_events to service_role;
+alter table public.paiement_events enable row level security;
+drop policy if exists "admins read paiement events" on public.paiement_events;
+create policy "admins read paiement events" on public.paiement_events
+  for select to authenticated using (public.has_role(auth.uid(), 'admin'));
