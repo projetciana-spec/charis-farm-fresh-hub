@@ -87,7 +87,9 @@ function RootShell({ children }: { children: ReactNode }) {
       <head><HeadContent /></head>
       <body>
         {children}
+        <script src="https://cdn.kkiapay.me/k.js" async />
         <Scripts />
+
       </body>
     </html>
   );
