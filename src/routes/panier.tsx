@@ -1,16 +1,18 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCart, formatXOF } from "@/lib/cart";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Trash2, ArrowLeft, ShoppingBag, MessageCircle } from "lucide-react";
+import { Trash2, ArrowLeft, ShoppingBag, MessageCircle, CreditCard } from "lucide-react";
+import { payWithKkiapay, preloadKkiapay } from "@/lib/kkiapay";
 
 export const Route = createFileRoute("/panier")({
   head: () => ({
     meta: [
       { title: "Mon panier — Charis FERME" },
-      { name: "description", content: "Finalisez votre commande Charis FERME." },
+      { name: "description", content: "Finalisez votre commande Charis FERME et payez en ligne (Mobile Money ou carte)." },
       { name: "robots", content: "noindex" },
     ],
+    links: [{ rel: "preconnect", href: "https://cdn.kkiapay.me" }, { rel: "preconnect", href: "https://api.kkiapay.me" }],
   }),
   component: PanierPage,
 });
@@ -24,9 +26,16 @@ function PanierPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
+  // Précharge le module de paiement dès l'ouverture du panier → widget instantané.
+  useEffect(() => {
+    void preloadKkiapay().catch(() => {});
+  }, []);
+
   const [form, setForm] = useState({
     nom: "", prenom: "", whatsapp: "", email: "", adresse: "", notes: "",
   });
+
+  const payable = items.every((i) => i.prix != null) && total > 0;
 
   function validate(): string | null {
     if (!form.prenom.trim() || !form.nom.trim()) return "Nom et prénom requis";
@@ -35,35 +44,81 @@ function PanierPage() {
     return null;
   }
 
+  async function createOrder(source: "site" | "whatsapp") {
+    const res = await fetch("/api/public/orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...form,
+        source,
+        items: items.map((i) => ({
+          produit_id: i.produit_id,
+          nom: i.nom,
+          prix: i.prix,
+          quantite: i.quantite,
+        })),
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.error ?? "Erreur");
+    return data as { id: string; numero: number };
+  }
+
   async function submitOnline() {
     const err = validate();
     if (err) return toast.error(err);
     setLoading(true);
     try {
-      const res = await fetch("/api/public/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...form,
-          source: "site",
-          items: items.map((i) => ({
-            produit_id: i.produit_id,
-            nom: i.nom,
-            prix: i.prix,
-            quantite: i.quantite,
-          })),
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.error ?? "Erreur");
+      const cmd = await createOrder("site");
       clear();
-      navigate({ to: "/commande/confirmee", search: { numero: String(data.numero) } });
+      navigate({ to: "/commande/confirmee", search: { numero: String(cmd.numero) } });
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : "Erreur d'envoi");
     } finally {
       setLoading(false);
     }
   }
+
+  async function payOnline() {
+    const err = validate();
+    if (err) return toast.error(err);
+    if (!payable) return toast.error("Certains articles sont sur devis : commandez via WhatsApp");
+    setLoading(true);
+    try {
+      const cmd = await createOrder("site");
+      const result = await payWithKkiapay({
+        amount: total,
+        data: cmd.id,
+        email: form.email,
+        phone: form.whatsapp,
+        fullname: `${form.prenom} ${form.nom}`.trim(),
+      });
+
+      if (result.status !== "success") {
+        toast.error("Paiement non abouti. Votre commande est enregistrée, nous vous contacterons.");
+        return;
+      }
+
+      const verify = await fetch("/api/public/kkiapay-verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ transactionId: result.transactionId, commandeId: cmd.id }),
+      });
+      const verified = await verify.json();
+      if (!verify.ok || !verified?.paid) {
+        toast.error("Paiement en cours de vérification — nous vous confirmons sur WhatsApp.");
+      } else {
+        toast.success("Paiement confirmé, merci !");
+      }
+      clear();
+      navigate({ to: "/commande/confirmee", search: { numero: String(cmd.numero) } });
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : "Erreur de paiement");
+    } finally {
+      setLoading(false);
+    }
+  }
+
 
   async function submitWhatsapp() {
     const err = validate();
@@ -156,12 +211,24 @@ function PanierPage() {
             </div>
 
             <button
+              onClick={payOnline}
+              disabled={loading || !payable}
+              className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-3.5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90 disabled:opacity-60"
+            >
+              <CreditCard className="h-4 w-4" />
+              {loading ? "Traitement…" : `Payer maintenant ${formatXOF(total)}`}
+            </button>
+            <p className="text-center text-xs text-muted-foreground">
+              MTN / Moov Money, cartes bancaires — paiement sécurisé par KkiaPay
+            </p>
+            <button
               onClick={submitOnline}
               disabled={loading}
-              className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
+              className="flex w-full items-center justify-center gap-2 rounded-full border px-6 py-3 text-sm font-semibold hover:bg-secondary disabled:opacity-60"
             >
-              <ShoppingBag className="h-4 w-4" /> Valider la commande
+              <ShoppingBag className="h-4 w-4" /> Commander sans payer maintenant
             </button>
+
             <button
               onClick={submitWhatsapp}
               disabled={loading}

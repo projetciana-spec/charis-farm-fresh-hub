@@ -24,6 +24,8 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as ApiPublicSuggestionsRouteImport } from './routes/api/public/suggestions'
 import { Route as ApiPublicOrdersRouteImport } from './routes/api/public/orders'
 import { Route as ApiPublicMigrateRouteImport } from './routes/api/public/migrate'
+import { Route as ApiPublicKkiapayWebhookRouteImport } from './routes/api/public/kkiapay-webhook'
+import { Route as ApiPublicKkiapayVerifyRouteImport } from './routes/api/public/kkiapay-verify'
 import { Route as AuthenticatedAdminSuggestionsRouteImport } from './routes/_authenticated/admin.suggestions'
 import { Route as AuthenticatedAdminProduitsRouteImport } from './routes/_authenticated/admin.produits'
 import { Route as AuthenticatedAdminParametresRouteImport } from './routes/_authenticated/admin.parametres'
@@ -106,6 +108,16 @@ const ApiPublicMigrateRoute = ApiPublicMigrateRouteImport.update({
   path: '/api/public/migrate',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicKkiapayWebhookRoute = ApiPublicKkiapayWebhookRouteImport.update({
+  id: '/api/public/kkiapay-webhook',
+  path: '/api/public/kkiapay-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicKkiapayVerifyRoute = ApiPublicKkiapayVerifyRouteImport.update({
+  id: '/api/public/kkiapay-verify',
+  path: '/api/public/kkiapay-verify',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminSuggestionsRoute =
   AuthenticatedAdminSuggestionsRouteImport.update({
     id: '/suggestions',
@@ -165,6 +177,8 @@ export interface FileRoutesByFullPath {
   '/admin/parametres': typeof AuthenticatedAdminParametresRoute
   '/admin/produits': typeof AuthenticatedAdminProduitsRoute
   '/admin/suggestions': typeof AuthenticatedAdminSuggestionsRoute
+  '/api/public/kkiapay-verify': typeof ApiPublicKkiapayVerifyRoute
+  '/api/public/kkiapay-webhook': typeof ApiPublicKkiapayWebhookRoute
   '/api/public/migrate': typeof ApiPublicMigrateRoute
   '/api/public/orders': typeof ApiPublicOrdersRoute
   '/api/public/suggestions': typeof ApiPublicSuggestionsRoute
@@ -187,6 +201,8 @@ export interface FileRoutesByTo {
   '/admin/parametres': typeof AuthenticatedAdminParametresRoute
   '/admin/produits': typeof AuthenticatedAdminProduitsRoute
   '/admin/suggestions': typeof AuthenticatedAdminSuggestionsRoute
+  '/api/public/kkiapay-verify': typeof ApiPublicKkiapayVerifyRoute
+  '/api/public/kkiapay-webhook': typeof ApiPublicKkiapayWebhookRoute
   '/api/public/migrate': typeof ApiPublicMigrateRoute
   '/api/public/orders': typeof ApiPublicOrdersRoute
   '/api/public/suggestions': typeof ApiPublicSuggestionsRoute
@@ -212,6 +228,8 @@ export interface FileRoutesById {
   '/_authenticated/admin/parametres': typeof AuthenticatedAdminParametresRoute
   '/_authenticated/admin/produits': typeof AuthenticatedAdminProduitsRoute
   '/_authenticated/admin/suggestions': typeof AuthenticatedAdminSuggestionsRoute
+  '/api/public/kkiapay-verify': typeof ApiPublicKkiapayVerifyRoute
+  '/api/public/kkiapay-webhook': typeof ApiPublicKkiapayWebhookRoute
   '/api/public/migrate': typeof ApiPublicMigrateRoute
   '/api/public/orders': typeof ApiPublicOrdersRoute
   '/api/public/suggestions': typeof ApiPublicSuggestionsRoute
@@ -237,6 +255,8 @@ export interface FileRouteTypes {
     | '/admin/parametres'
     | '/admin/produits'
     | '/admin/suggestions'
+    | '/api/public/kkiapay-verify'
+    | '/api/public/kkiapay-webhook'
     | '/api/public/migrate'
     | '/api/public/orders'
     | '/api/public/suggestions'
@@ -259,6 +279,8 @@ export interface FileRouteTypes {
     | '/admin/parametres'
     | '/admin/produits'
     | '/admin/suggestions'
+    | '/api/public/kkiapay-verify'
+    | '/api/public/kkiapay-webhook'
     | '/api/public/migrate'
     | '/api/public/orders'
     | '/api/public/suggestions'
@@ -283,6 +305,8 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/parametres'
     | '/_authenticated/admin/produits'
     | '/_authenticated/admin/suggestions'
+    | '/api/public/kkiapay-verify'
+    | '/api/public/kkiapay-webhook'
     | '/api/public/migrate'
     | '/api/public/orders'
     | '/api/public/suggestions'
@@ -301,6 +325,8 @@ export interface RootRouteChildren {
   ProduitsRoute: typeof ProduitsRouteWithChildren
   VisitesRoute: typeof VisitesRoute
   CommandeConfirmeeRoute: typeof CommandeConfirmeeRoute
+  ApiPublicKkiapayVerifyRoute: typeof ApiPublicKkiapayVerifyRoute
+  ApiPublicKkiapayWebhookRoute: typeof ApiPublicKkiapayWebhookRoute
   ApiPublicMigrateRoute: typeof ApiPublicMigrateRoute
   ApiPublicOrdersRoute: typeof ApiPublicOrdersRoute
   ApiPublicSuggestionsRoute: typeof ApiPublicSuggestionsRoute
@@ -413,6 +439,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicMigrateRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/kkiapay-webhook': {
+      id: '/api/public/kkiapay-webhook'
+      path: '/api/public/kkiapay-webhook'
+      fullPath: '/api/public/kkiapay-webhook'
+      preLoaderRoute: typeof ApiPublicKkiapayWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/kkiapay-verify': {
+      id: '/api/public/kkiapay-verify'
+      path: '/api/public/kkiapay-verify'
+      fullPath: '/api/public/kkiapay-verify'
+      preLoaderRoute: typeof ApiPublicKkiapayVerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin/suggestions': {
       id: '/_authenticated/admin/suggestions'
       path: '/suggestions'
@@ -523,6 +563,8 @@ const rootRouteChildren: RootRouteChildren = {
   ProduitsRoute: ProduitsRouteWithChildren,
   VisitesRoute: VisitesRoute,
   CommandeConfirmeeRoute: CommandeConfirmeeRoute,
+  ApiPublicKkiapayVerifyRoute: ApiPublicKkiapayVerifyRoute,
+  ApiPublicKkiapayWebhookRoute: ApiPublicKkiapayWebhookRoute,
   ApiPublicMigrateRoute: ApiPublicMigrateRoute,
   ApiPublicOrdersRoute: ApiPublicOrdersRoute,
   ApiPublicSuggestionsRoute: ApiPublicSuggestionsRoute,
@@ -530,13 +572,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
