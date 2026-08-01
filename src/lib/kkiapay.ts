@@ -1,5 +1,7 @@
 // Client KkiaPay : chargement paresseux du SDK + ouverture du widget.
-export const KKIAPAY_PUBLIC_KEY = "716a101082d411f1ac978f68d5f4d598";
+export const KKIAPAY_PUBLIC_KEY =
+  import.meta.env.VITE_KKIAPAY_PUBLIC_KEY || "716a101082d411f1ac978f68d5f4d598";
+export const KKIAPAY_SANDBOX = import.meta.env.VITE_KKIAPAY_SANDBOX === "true";
 const SDK_URL = "https://cdn.kkiapay.me/k.js";
 
 type KkiapayWindow = Window & {
@@ -76,7 +78,7 @@ export async function payWithKkiapay(opts: {
     w.openKkiapay!({
       amount: Math.max(1, Math.round(opts.amount)),
       key: KKIAPAY_PUBLIC_KEY,
-      sandbox: opts.sandbox ?? false,
+      sandbox: opts.sandbox ?? KKIAPAY_SANDBOX,
       position: "center",
       theme: "#2f6d3a",
       data: opts.data ?? "",
