@@ -233,3 +233,57 @@ alter table public.paiement_events enable row level security;
 drop policy if exists "admins read paiement events" on public.paiement_events;
 create policy "admins read paiement events" on public.paiement_events
   for select to authenticated using (public.has_role(auth.uid(), 'admin'));
+
+-- ---------- Création de commande en un seul aller-retour (anon-safe) ----------
+-- SECURITY DEFINER : permet de créer la commande + ses lignes et de renvoyer
+-- le numéro sans donner de droit de lecture sur la table aux visiteurs.
+create or replace function public.creer_commande(payload jsonb)
+returns table (commande_id uuid, numero int)
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_id uuid;
+  v_num int;
+  v_total numeric;
+begin
+  if payload->>'nom' is null or payload->>'prenom' is null or payload->>'whatsapp' is null then
+    raise exception 'champs_obligatoires_manquants';
+  end if;
+  if jsonb_typeof(payload->'items') <> 'array' or jsonb_array_length(payload->'items') = 0 then
+    raise exception 'items_manquants';
+  end if;
+
+  select coalesce(sum(nullif(x->>'prix','')::numeric * (x->>'quantite')::int), 0)
+    into v_total
+    from jsonb_array_elements(payload->'items') x;
+
+  insert into public.commandes (nom, prenom, whatsapp, email, adresse, notes, total, source, statut)
+  values (
+    left(payload->>'nom', 100),
+    left(payload->>'prenom', 100),
+    left(payload->>'whatsapp', 30),
+    nullif(left(coalesce(payload->>'email',''), 255), ''),
+    nullif(left(coalesce(payload->>'adresse',''), 500), ''),
+    nullif(left(coalesce(payload->>'notes',''), 1000), ''),
+    v_total,
+    coalesce(nullif(payload->>'source',''), 'site'),
+    'nouveau'
+  )
+  returning id, commandes.numero into v_id, v_num;
+
+  insert into public.commande_items (commande_id, produit_id, nom_snapshot, prix_snapshot, quantite)
+  select v_id,
+         nullif(x->>'produit_id','')::uuid,
+         left(x->>'nom', 200),
+         nullif(x->>'prix','')::numeric,
+         least(greatest((x->>'quantite')::int, 1), 999)
+    from jsonb_array_elements(payload->'items') x;
+
+  return query select v_id, v_num;
+end;
+$$;
+
+revoke all on function public.creer_commande(jsonb) from public;
+grant execute on function public.creer_commande(jsonb) to anon, authenticated, service_role;
