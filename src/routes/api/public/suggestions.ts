@@ -22,8 +22,8 @@ export const Route = createFileRoute("/api/public/suggestions")({
         if (!parsed.success) {
           return new Response(JSON.stringify({ error: "invalid_input" }), { status: 400 });
         }
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { error } = await supabaseAdmin.from("suggestions").insert({
+        const { createServerDbClient } = await import("@/lib/supabase-public.server");
+        const { error } = await createServerDbClient().from("suggestions").insert({
           nom: parsed.data.nom,
           email: parsed.data.email || null,
           whatsapp: parsed.data.whatsapp || null,
