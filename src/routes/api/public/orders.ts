@@ -96,48 +96,53 @@ export const Route = createFileRoute("/api/public/orders")({
           0,
         );
 
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { data: cmd, error } = await supabaseAdmin
-          .from("commandes")
-          .insert({
+        let db: ReturnType<typeof import("@/lib/supabase-public.server").createServerDbClient>;
+        try {
+          const { createServerDbClient } = await import("@/lib/supabase-public.server");
+          db = createServerDbClient();
+        } catch (e) {
+          console.error("[orders] supabase config", e);
+          return new Response(JSON.stringify({ error: "config_error" }), {
+            status: 500,
+            headers: { "content-type": "application/json" },
+          });
+        }
+
+        // Commande + lignes créées en un seul aller-retour (RPC security definer).
+        const { data, error } = await (db as any).rpc("creer_commande", {
+          payload: {
             nom: order.nom,
             prenom: order.prenom,
             whatsapp: order.whatsapp,
-            email: order.email || null,
-            adresse: order.adresse || null,
-            notes: order.notes || null,
-            total,
+            email: order.email || "",
+            adresse: order.adresse || "",
+            notes: order.notes || "",
             source: order.source,
-            statut: "nouveau",
-          })
-          .select("id, numero")
-          .single();
+            items: order.items,
+          },
+        });
 
-        if (error || !cmd) {
-          console.error("[orders] insert failed", error);
-          return new Response(JSON.stringify({ error: "db_error" }), { status: 500 });
+        const row = Array.isArray(data) ? data[0] : data;
+        if (error || !row) {
+          console.error("[orders] rpc creer_commande failed", error);
+          return new Response(JSON.stringify({ error: "db_error" }), {
+            status: 500,
+            headers: { "content-type": "application/json" },
+          });
         }
 
-        const items = order.items.map((i) => ({
-          commande_id: cmd.id,
-          produit_id: i.produit_id,
-          nom_snapshot: i.nom,
-          prix_snapshot: i.prix,
-          quantite: i.quantite,
-        }));
-        await supabaseAdmin.from("commande_items").insert(items);
+        const numero = Number(row.numero);
+        // La notification WhatsApp ne doit jamais ralentir le checkout.
+        const notif = sendTwilioWhatsapp(
+          process.env.WHATSAPP_ADMIN || "+22955345916",
+          formatMessage(order, numero, total),
+        ).catch(() => ({ sent: false, reason: "exception" }));
+        void notif;
 
-        // Récupérer le numéro admin WhatsApp
-        const { data: param } = await supabaseAdmin
-          .from("parametres")
-          .select("valeur")
-          .eq("cle", "whatsapp_admin")
-          .maybeSingle();
-        const adminNumber = param?.valeur ?? "+22955345916";
-        const message = formatMessage(order, cmd.numero, total);
-        const notif = await sendTwilioWhatsapp(adminNumber, message);
-
-        return Response.json({ ok: true, id: cmd.id, numero: cmd.numero, notif });
+        return new Response(
+          JSON.stringify({ ok: true, id: row.commande_id, numero }),
+          { status: 200, headers: { "content-type": "application/json", "cache-control": "no-store" } },
+        );
       },
     },
   },
