@@ -85,31 +85,30 @@ function PanierPage() {
     if (!payable) return toast.error("Certains articles sont sur devis : commandez via WhatsApp");
     setLoading(true);
     try {
-      const cmd = await createOrder("site");
-      const result = await payWithKkiapay({
+      // Le widget s'ouvre immédiatement, l'enregistrement de la commande se fait en parallèle.
+      const orderPromise = createOrder("site");
+      const payPromise = payWithKkiapay({
         amount: total,
-        data: cmd.id,
         email: form.email,
         phone: form.whatsapp,
         fullname: `${form.prenom} ${form.nom}`.trim(),
       });
+      const [result, cmd] = await Promise.all([payPromise, orderPromise]);
 
       if (result.status !== "success") {
         toast.error("Paiement non abouti. Votre commande est enregistrée, nous vous contacterons.");
         return;
       }
 
-      const verify = await fetch("/api/public/kkiapay-verify", {
+      // Vérification serveur en arrière-plan (le webhook KkiaPay reste la source de vérité).
+      void fetch("/api/public/kkiapay-verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ transactionId: result.transactionId, commandeId: cmd.id }),
-      });
-      const verified = await verify.json();
-      if (!verify.ok || !verified?.paid) {
-        toast.error("Paiement en cours de vérification — nous vous confirmons sur WhatsApp.");
-      } else {
-        toast.success("Paiement confirmé, merci !");
-      }
+        keepalive: true,
+      }).catch(() => {});
+
+      toast.success("Paiement reçu, merci !");
       clear();
       navigate({ to: "/commande/confirmee", search: { numero: String(cmd.numero) } });
     } catch (e: unknown) {
@@ -118,6 +117,7 @@ function PanierPage() {
       setLoading(false);
     }
   }
+
 
 
   async function submitWhatsapp() {
