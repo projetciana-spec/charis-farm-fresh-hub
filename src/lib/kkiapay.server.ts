@@ -59,10 +59,13 @@ export async function verifyTransaction(transactionId: string): Promise<Verified
  */
 export async function applyPayment(transactionId: string, commandeId?: string | null) {
   const verified = await verifyTransaction(transactionId);
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const admin = supabaseAdmin as unknown as {
+  // Client serveur résilient : clé service role si disponible (SUPABASE_ ou
+  // OWN_SUPABASE_), sinon clé publique — jamais de crash faute de variable.
+  const { createServerDbClient } = await import("@/lib/supabase-public.server");
+  const admin = createServerDbClient() as unknown as {
     from: (t: string) => any;
   };
+
 
   // Journal des évènements : la contrainte unique rend le rejeu inoffensif.
   await admin

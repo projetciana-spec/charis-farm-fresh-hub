@@ -23,6 +23,7 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as ApiPublicSuggestionsRouteImport } from './routes/api/public/suggestions'
 import { Route as ApiPublicOrdersRouteImport } from './routes/api/public/orders'
+import { Route as ApiPublicOrderStatusRouteImport } from './routes/api/public/order-status'
 import { Route as ApiPublicMigrateRouteImport } from './routes/api/public/migrate'
 import { Route as ApiPublicKkiapayWebhookRouteImport } from './routes/api/public/kkiapay-webhook'
 import { Route as ApiPublicKkiapayVerifyRouteImport } from './routes/api/public/kkiapay-verify'
@@ -103,6 +104,11 @@ const ApiPublicOrdersRoute = ApiPublicOrdersRouteImport.update({
   path: '/api/public/orders',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicOrderStatusRoute = ApiPublicOrderStatusRouteImport.update({
+  id: '/api/public/order-status',
+  path: '/api/public/order-status',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicMigrateRoute = ApiPublicMigrateRouteImport.update({
   id: '/api/public/migrate',
   path: '/api/public/migrate',
@@ -180,6 +186,7 @@ export interface FileRoutesByFullPath {
   '/api/public/kkiapay-verify': typeof ApiPublicKkiapayVerifyRoute
   '/api/public/kkiapay-webhook': typeof ApiPublicKkiapayWebhookRoute
   '/api/public/migrate': typeof ApiPublicMigrateRoute
+  '/api/public/order-status': typeof ApiPublicOrderStatusRoute
   '/api/public/orders': typeof ApiPublicOrdersRoute
   '/api/public/suggestions': typeof ApiPublicSuggestionsRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
@@ -204,6 +211,7 @@ export interface FileRoutesByTo {
   '/api/public/kkiapay-verify': typeof ApiPublicKkiapayVerifyRoute
   '/api/public/kkiapay-webhook': typeof ApiPublicKkiapayWebhookRoute
   '/api/public/migrate': typeof ApiPublicMigrateRoute
+  '/api/public/order-status': typeof ApiPublicOrderStatusRoute
   '/api/public/orders': typeof ApiPublicOrdersRoute
   '/api/public/suggestions': typeof ApiPublicSuggestionsRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
@@ -231,6 +239,7 @@ export interface FileRoutesById {
   '/api/public/kkiapay-verify': typeof ApiPublicKkiapayVerifyRoute
   '/api/public/kkiapay-webhook': typeof ApiPublicKkiapayWebhookRoute
   '/api/public/migrate': typeof ApiPublicMigrateRoute
+  '/api/public/order-status': typeof ApiPublicOrderStatusRoute
   '/api/public/orders': typeof ApiPublicOrdersRoute
   '/api/public/suggestions': typeof ApiPublicSuggestionsRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
@@ -258,6 +267,7 @@ export interface FileRouteTypes {
     | '/api/public/kkiapay-verify'
     | '/api/public/kkiapay-webhook'
     | '/api/public/migrate'
+    | '/api/public/order-status'
     | '/api/public/orders'
     | '/api/public/suggestions'
     | '/admin/'
@@ -282,6 +292,7 @@ export interface FileRouteTypes {
     | '/api/public/kkiapay-verify'
     | '/api/public/kkiapay-webhook'
     | '/api/public/migrate'
+    | '/api/public/order-status'
     | '/api/public/orders'
     | '/api/public/suggestions'
     | '/admin'
@@ -308,6 +319,7 @@ export interface FileRouteTypes {
     | '/api/public/kkiapay-verify'
     | '/api/public/kkiapay-webhook'
     | '/api/public/migrate'
+    | '/api/public/order-status'
     | '/api/public/orders'
     | '/api/public/suggestions'
     | '/_authenticated/admin/'
@@ -328,6 +340,7 @@ export interface RootRouteChildren {
   ApiPublicKkiapayVerifyRoute: typeof ApiPublicKkiapayVerifyRoute
   ApiPublicKkiapayWebhookRoute: typeof ApiPublicKkiapayWebhookRoute
   ApiPublicMigrateRoute: typeof ApiPublicMigrateRoute
+  ApiPublicOrderStatusRoute: typeof ApiPublicOrderStatusRoute
   ApiPublicOrdersRoute: typeof ApiPublicOrdersRoute
   ApiPublicSuggestionsRoute: typeof ApiPublicSuggestionsRoute
 }
@@ -430,6 +443,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/orders'
       fullPath: '/api/public/orders'
       preLoaderRoute: typeof ApiPublicOrdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/order-status': {
+      id: '/api/public/order-status'
+      path: '/api/public/order-status'
+      fullPath: '/api/public/order-status'
+      preLoaderRoute: typeof ApiPublicOrderStatusRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/migrate': {
@@ -566,6 +586,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicKkiapayVerifyRoute: ApiPublicKkiapayVerifyRoute,
   ApiPublicKkiapayWebhookRoute: ApiPublicKkiapayWebhookRoute,
   ApiPublicMigrateRoute: ApiPublicMigrateRoute,
+  ApiPublicOrderStatusRoute: ApiPublicOrderStatusRoute,
   ApiPublicOrdersRoute: ApiPublicOrdersRoute,
   ApiPublicSuggestionsRoute: ApiPublicSuggestionsRoute,
 }
