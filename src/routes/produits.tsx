@@ -23,8 +23,21 @@ export const Route = createFileRoute("/produits")({
     context.queryClient.ensureQueryData(produitsQO);
     context.queryClient.ensureQueryData(categoriesQO);
   },
+  errorComponent: () => (
+    <div className="mx-auto max-w-2xl px-4 py-24 text-center">
+      <h1 className="font-display text-3xl font-semibold">Catalogue momentanément indisponible</h1>
+      <p className="mt-3 text-muted-foreground">La connexion au serveur a échoué. Réessayez dans un instant.</p>
+      <button
+        onClick={() => window.location.reload()}
+        className="mt-6 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground"
+      >
+        Recharger la page
+      </button>
+    </div>
+  ),
   component: ProductsPage,
 });
+
 
 function ProductsPage() {
   const { data: produits } = useSuspenseQuery(produitsQO);
