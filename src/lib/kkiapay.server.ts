@@ -1,7 +1,15 @@
 // Vérification serveur-à-serveur des transactions KkiaPay.
 // Aucune confiance n'est accordée au client : le montant et le statut viennent
 // toujours de l'API KkiaPay, jamais du navigateur.
-const KKIAPAY_API = "https://api.kkiapay.me/api/v1/transactions/status";
+const KKIAPAY_API_LIVE = "https://api.kkiapay.me/api/v1/transactions/status";
+const KKIAPAY_API_SANDBOX = "https://api-sandbox.kkiapay.me/api/v1/transactions/status";
+
+function isSandbox() {
+  return (
+    (process.env.KKIAPAY_SANDBOX ?? process.env.VITE_KKIAPAY_SANDBOX ?? "").toLowerCase() === "true"
+  );
+}
+
 
 export type VerifiedTransaction = {
   ok: boolean;
