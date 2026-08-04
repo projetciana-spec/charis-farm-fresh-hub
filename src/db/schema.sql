@@ -303,7 +303,7 @@ create policy "anyone insert validated suggestions" on public.suggestions
     and char_length(coalesce(message, '')) between 5 and 2000
     and (email is null or (char_length(email) <= 255 and email like '%_@_%.__%'))
     and (whatsapp is null or char_length(whatsapp) <= 30)
-    and coalesce(statut, 'nouveau') = 'nouveau'
+    and lu = false
   );
 
 -- 2) has_role n'est plus exécutable par les visiteurs anonymes.
