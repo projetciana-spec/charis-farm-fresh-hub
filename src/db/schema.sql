@@ -300,7 +300,7 @@ create policy "anyone insert validated suggestions" on public.suggestions
   for insert to anon, authenticated
   with check (
     char_length(coalesce(nom, '')) between 1 and 100
-    and char_length(coalesce(message, '')) between 5 and 2000
+    and char_length(coalesce(message, '')) between 3 and 2000
     and (email is null or (char_length(email) <= 255 and email like '%_@_%.__%'))
     and (whatsapp is null or char_length(whatsapp) <= 30)
     and lu = false
