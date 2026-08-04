@@ -321,6 +321,7 @@ declare
   v_id uuid;
   v_num int;
   v_total numeric;
+  v_count int;
 begin
   if coalesce(payload->>'nom','') = '' or coalesce(payload->>'prenom','') = ''
      or coalesce(payload->>'whatsapp','') = '' then
@@ -332,25 +333,20 @@ begin
     raise exception 'items_invalides';
   end if;
 
-  create temp table if not exists _tmp_items (
-    produit_id uuid,
-    nom text,
-    prix numeric,
-    quantite int
-  ) on commit drop;
-  delete from _tmp_items;
+  -- Les prix et noms viennent de la base, jamais du navigateur.
+  with demandes as (
+    select nullif(x->>'produit_id','')::uuid as produit_id,
+           least(greatest(coalesce((x->>'quantite')::int, 1), 1), 999) as quantite
+      from jsonb_array_elements(payload->'items') x
+  )
+  select count(*), coalesce(sum(coalesce(p.prix, 0) * d.quantite), 0)
+    into v_count, v_total
+    from demandes d
+    join public.produits p on p.id = d.produit_id and p.en_stock = true;
 
-  insert into _tmp_items (produit_id, nom, prix, quantite)
-  select p.id, p.nom, p.prix, least(greatest(coalesce((x->>'quantite')::int, 1), 1), 999)
-    from jsonb_array_elements(payload->'items') x
-    join public.produits p on p.id = nullif(x->>'produit_id','')::uuid
-   where p.en_stock = true;
-
-  if (select count(*) from _tmp_items) <> jsonb_array_length(payload->'items') then
+  if v_count <> jsonb_array_length(payload->'items') then
     raise exception 'produit_inconnu_ou_indisponible';
   end if;
-
-  select coalesce(sum(coalesce(prix, 0) * quantite), 0) into v_total from _tmp_items;
 
   insert into public.commandes (nom, prenom, whatsapp, email, adresse, notes, total, source, statut)
   values (
@@ -367,7 +363,13 @@ begin
   returning id, commandes.numero into v_id, v_num;
 
   insert into public.commande_items (commande_id, produit_id, nom_snapshot, prix_snapshot, quantite)
-  select v_id, produit_id, nom, prix, quantite from _tmp_items;
+  select v_id, p.id, p.nom, p.prix, d.quantite
+    from (
+      select nullif(x->>'produit_id','')::uuid as produit_id,
+             least(greatest(coalesce((x->>'quantite')::int, 1), 1), 999) as quantite
+        from jsonb_array_elements(payload->'items') x
+    ) d
+    join public.produits p on p.id = d.produit_id and p.en_stock = true;
 
   return query select v_id, v_num;
 end;
