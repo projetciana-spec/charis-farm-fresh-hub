@@ -344,13 +344,13 @@ begin
   select p.id, p.nom, p.prix, least(greatest(coalesce((x->>'quantite')::int, 1), 1), 999)
     from jsonb_array_elements(payload->'items') x
     join public.produits p on p.id = nullif(x->>'produit_id','')::uuid
-   where p.actif = true;
+   where p.en_stock = true;
 
   if (select count(*) from _tmp_items) <> jsonb_array_length(payload->'items') then
-    raise exception 'produit_inconnu_ou_inactif';
+    raise exception 'produit_inconnu_ou_indisponible';
   end if;
 
-  select coalesce(sum(prix * quantite), 0) into v_total from _tmp_items;
+  select coalesce(sum(coalesce(prix, 0) * quantite), 0) into v_total from _tmp_items;
 
   insert into public.commandes (nom, prenom, whatsapp, email, adresse, notes, total, source, statut)
   values (
