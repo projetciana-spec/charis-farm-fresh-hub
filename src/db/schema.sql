@@ -287,3 +287,93 @@ $$;
 
 revoke all on function public.creer_commande(jsonb) from public;
 grant execute on function public.creer_commande(jsonb) to anon, authenticated, service_role;
+-- ---------- Durcissement sécurité ----------
+-- 1) Plus d'insertion directe des commandes/lignes/suggestions par les visiteurs :
+--    tout passe par les fonctions validées ci-dessous.
+drop policy if exists "anyone insert commandes" on public.commandes;
+drop policy if exists "anyone insert commande_items" on public.commande_items;
+revoke insert on public.commandes from anon, authenticated;
+revoke insert on public.commande_items from anon, authenticated;
+
+drop policy if exists "anyone insert suggestions" on public.suggestions;
+create policy "anyone insert validated suggestions" on public.suggestions
+  for insert to anon, authenticated
+  with check (
+    char_length(coalesce(nom, '')) between 1 and 100
+    and char_length(coalesce(message, '')) between 3 and 2000
+    and (email is null or (char_length(email) <= 255 and email like '%_@_%.__%'))
+    and (whatsapp is null or char_length(whatsapp) <= 30)
+    and lu = false
+  );
+
+-- 2) has_role n'est plus exécutable par les visiteurs anonymes.
+revoke execute on function public.has_role(uuid, app_role) from public, anon;
+grant execute on function public.has_role(uuid, app_role) to authenticated, service_role;
+
+-- 3) creer_commande : les prix ne viennent plus du navigateur mais de la base.
+create or replace function public.creer_commande(payload jsonb)
+returns table (commande_id uuid, numero int)
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_id uuid;
+  v_num int;
+  v_total numeric;
+  v_count int;
+begin
+  if coalesce(payload->>'nom','') = '' or coalesce(payload->>'prenom','') = ''
+     or coalesce(payload->>'whatsapp','') = '' then
+    raise exception 'champs_obligatoires_manquants';
+  end if;
+  if jsonb_typeof(payload->'items') <> 'array'
+     or jsonb_array_length(payload->'items') = 0
+     or jsonb_array_length(payload->'items') > 100 then
+    raise exception 'items_invalides';
+  end if;
+
+  -- Les prix et noms viennent de la base, jamais du navigateur.
+  with demandes as (
+    select nullif(x->>'produit_id','')::uuid as produit_id,
+           least(greatest(coalesce((x->>'quantite')::int, 1), 1), 999) as quantite
+      from jsonb_array_elements(payload->'items') x
+  )
+  select count(*), coalesce(sum(coalesce(p.prix, 0) * d.quantite), 0)
+    into v_count, v_total
+    from demandes d
+    join public.produits p on p.id = d.produit_id and p.en_stock = true;
+
+  if v_count <> jsonb_array_length(payload->'items') then
+    raise exception 'produit_inconnu_ou_indisponible';
+  end if;
+
+  insert into public.commandes (nom, prenom, whatsapp, email, adresse, notes, total, source, statut)
+  values (
+    left(payload->>'nom', 100),
+    left(payload->>'prenom', 100),
+    left(payload->>'whatsapp', 30),
+    nullif(left(coalesce(payload->>'email',''), 255), ''),
+    nullif(left(coalesce(payload->>'adresse',''), 500), ''),
+    nullif(left(coalesce(payload->>'notes',''), 1000), ''),
+    v_total,
+    coalesce(nullif(payload->>'source',''), 'site'),
+    'nouveau'
+  )
+  returning id, commandes.numero into v_id, v_num;
+
+  insert into public.commande_items (commande_id, produit_id, nom_snapshot, prix_snapshot, quantite)
+  select v_id, p.id, p.nom, p.prix, d.quantite
+    from (
+      select nullif(x->>'produit_id','')::uuid as produit_id,
+             least(greatest(coalesce((x->>'quantite')::int, 1), 1), 999) as quantite
+        from jsonb_array_elements(payload->'items') x
+    ) d
+    join public.produits p on p.id = d.produit_id and p.en_stock = true;
+
+  return query select v_id, v_num;
+end;
+$$;
+
+revoke all on function public.creer_commande(jsonb) from public;
+grant execute on function public.creer_commande(jsonb) to anon, authenticated, service_role;
